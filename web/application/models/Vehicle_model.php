@@ -247,7 +247,7 @@ class Vehicle_model extends CI_Model
     }
 
     function getDailySubmissionsForOneVehicle($answersId){
-        $this->db->select('answers.id as answerid, answers.response_ids, answers.vehicle_reg, answers.user_id, answers.response_on, users.name as custodian');
+        $this->db->select('answers.id as answerid, answers.response_ids, answers.vehicle_reg, answers.user_id, answers.comment, answers.response_on, users.name as custodian');
         $this->db->from('answers');
         $this->db->join('users', 'users.id = answers.user_id', 'inner');
         $this->db->where('answers.is_deleted', 0);
@@ -260,7 +260,7 @@ class Vehicle_model extends CI_Model
     }
 
     function getWeeklySubmissionsForOneVehicle($answersId){
-        $this->db->select('answers.id as answerid, answers.response_ids, answers.vehicle_reg, answers.user_id, answers.response_on, users.name as custodian');
+        $this->db->select('answers.id as answerid, answers.response_ids, answers.vehicle_reg, answers.user_id, answers.comment, answers.response_on, users.name as custodian');
         $this->db->from('answers');
         $this->db->join('users', 'users.id = answers.user_id', 'inner');
         $this->db->where('answers.is_deleted', 0);
@@ -386,6 +386,241 @@ class Vehicle_model extends CI_Model
         $this->db->update('vehicles', $vehicleInfo);
         
         return $this->db->affected_rows();
+    }
+
+    function deleteAnswer($answerId, $answerInfo)
+    {
+        $this->db->where('id', $answerId);
+        $this->db->update('answers', $answerInfo);
+        
+        return $this->db->affected_rows();
+    }
+
+
+    function dailyInspCount($searchText = '', $vendor)
+    {
+        $this->db->select('BaseTbl.id as check_id, BaseTbl.vehicle_reg, BaseTbl.response_on');
+        $this->db->from('answers as BaseTbl');
+        if(!empty($searchText)) {
+            $likeCriteria = "( BaseTbl.vehicle_reg  LIKE '%".$searchText."%'
+            OR  BaseTbl.response_on  LIKE '%".$searchText."%'
+                           )";
+            $this->db->where($likeCriteria);
+        }
+        $this->db->where('BaseTbl.is_deleted', 0);
+        $this->db->where('BaseTbl.response_type =', 'daily');
+        $this->db->where('BaseTbl.user_id =', $vendor);
+        $query = $this->db->get();
+        
+        return $query->num_rows();
+    }
+
+    function dailyInsp($searchText = '', $page, $segment, $vendor)
+    {
+        $this->db->select('BaseTbl.id as check_id, BaseTbl.vehicle_reg, BaseTbl.response_on');
+        $this->db->from('answers as BaseTbl');
+        if(!empty($searchText)) {
+            $likeCriteria = "( BaseTbl.vehicle_reg  LIKE '%".$searchText."%'
+            OR  BaseTbl.response_on  LIKE '%".$searchText."%'
+                           )";
+            $this->db->where($likeCriteria);
+        }
+        $this->db->where('BaseTbl.is_deleted', 0);
+        $this->db->where('BaseTbl.response_type =', 'daily');
+        $this->db->where('BaseTbl.user_id =', $vendor);
+        $this->db->order_by('BaseTbl.id', 'DESC');
+        $this->db->limit($page, $segment);
+        $query = $this->db->get();
+        
+        $result = $query->result();        
+        return $result;
+    }
+
+    function weeklyInspCount($searchText = '', $vendor)
+    {
+        $this->db->select('BaseTbl.id as check_id, BaseTbl.vehicle_reg, BaseTbl.response_on');
+        $this->db->from('answers as BaseTbl');
+        if(!empty($searchText)) {
+            $likeCriteria = "( BaseTbl.vehicle_reg  LIKE '%".$searchText."%'
+            OR  BaseTbl.response_on  LIKE '%".$searchText."%'
+                           )";
+            $this->db->where($likeCriteria);
+        }
+        $this->db->where('BaseTbl.is_deleted', 0);
+        $this->db->where('BaseTbl.user_id =', $vendor);
+        $this->db->where('BaseTbl.response_type =', 'weekly');
+        $query = $this->db->get();
+        
+        return $query->num_rows();
+    }
+
+    function weeklyInsp($searchText = '', $page, $segment, $vendor)
+    {
+        $this->db->select('BaseTbl.id as check_id, BaseTbl.vehicle_reg, BaseTbl.response_on');
+        $this->db->from('answers as BaseTbl');
+        if(!empty($searchText)) {
+            $likeCriteria = "( BaseTbl.vehicle_reg  LIKE '%".$searchText."%'
+            OR  BaseTbl.response_on  LIKE '%".$searchText."%'
+                           )";
+            $this->db->where($likeCriteria);
+        }
+        $this->db->where('BaseTbl.is_deleted', 0);
+        $this->db->where('BaseTbl.user_id =', $vendor);
+        $this->db->where('BaseTbl.response_type =', 'weekly');
+        $this->db->order_by('BaseTbl.id', 'DESC');
+        $this->db->limit($page, $segment);
+        $query = $this->db->get();
+        
+        $result = $query->result();        
+        return $result;
+    }
+
+    public function get_assigned_vehicles($id)
+    {
+        $this->db->select( 
+        'users.email,
+        vehicle_assignment.id,
+        vehicles.regno,
+        vehicles.model,
+        vehicles.name,
+        vehicles.department');
+        $this->db->from('vehicle_assignment');
+        $this->db->join('users', 'vehicle_assignment.user_id  = users.id','inner');
+        $this->db->join('vehicles', 'vehicle_assignment.vehicle_id = vehicles.id','inner');
+        $this->db->where('vehicle_assignment.user_id', $id);
+        $query = $this->db->get()->result();
+        return $query;
+    }
+
+    
+    public function dailyCheckQuestions()
+    {
+        
+        $this->db->select('vehicle_sub_systems.name,
+        checks.options,
+        checks.id,
+        checks.title,
+        checks.description');
+        $this->db->from('checks');
+        $this->db->join('vehicle_sub_systems', 'checks.vehicle_sub_system_id = vehicle_sub_systems.id','inner');
+        $this->db->order_by('checks.title', 'asc');
+        $this->db->where('checks.check_type', 'daily');
+
+        $query = $this->db->get()->result();
+        return $query;
+    }
+    
+    public function weeklyCheckQuestions()
+    {
+        $this->db->select('vehicle_sub_systems.name,
+        checks.options,
+        checks.id,
+        checks.title,
+        checks.description');
+        $this->db->from('checks');
+        $this->db->join('vehicle_sub_systems', 'checks.vehicle_sub_system_id = vehicle_sub_systems.id','inner');
+        $this->db->order_by('checks.title', 'asc');
+        $this->db->where('checks.check_type', 'weekly');
+        $query = $this->db->get()->result();
+        return $query;
+    }
+
+    public function addNewWeeklyInspPost($userID, $vehicle_reg, $comment, $response_ids){
+        //pick username and compare with what is in db
+        //$params=json_encode($param);
+        //$user = $params['user_email'];
+        //$vehicle_reg = json_decode($params['vehicle']);
+        // $vehicle_reg = 'UAA22';
+        $user_id = $userID;
+        //$comment = $params['comment'];
+        //sanitize params to remain with only those to be inserted to bd
+        //$res= $params;
+        //unset($res['vehicle']);
+        //unset($res['user_email']);
+        //unset($res['comment']);
+        
+        // //print_r($res);
+
+        // //recieve params
+        $valueArray = array(
+            // 'vehicle_reg'=>$vehicle_reg,
+            // 'user_id'=>$user_id,
+            // 'response_on'=>date('Y-m-d H:i:s'),
+            // 'response_type'=>'weekly',
+            // 'response_ids' => $res,
+            // 'comment'=>$comment
+
+            'vehicle_reg'=>$vehicle_reg,
+            'user_id'=>$user_id,
+            'response_on'=>date('Y-m-d H:i:s'),
+            'response_type'=>'weekly',
+            'response_ids' => json_encode($response_ids),
+            'comment'=> $comment
+        );       
+       //check if that regno has been submitted already
+       //$check = $this->check_already_inspected_weekly($vehicle_reg);
+       //if($check == FALSE){
+        $this->db->trans_start();
+        $query = $this->db->insert('answers',$valueArray);
+        $insert_id = $this->db->insert_id();            
+        $this->db->trans_complete();            
+            
+
+        if($query){
+            return $insert_id;  
+        }
+      
+              
+    }
+
+    public function addNewDailyInspPost($userID, $vehicle_reg, $comment, $response_ids){
+        $user_id = $userID;
+        // //recieve params
+        $valueArray = array(
+            'vehicle_reg'=>$vehicle_reg,
+            'user_id'=>$user_id,
+            'response_on'=>date('Y-m-d H:i:s'),
+            'response_type'=>'daily',
+            'response_ids' => json_encode($response_ids),
+            'comment'=> $comment
+        );       
+
+            $this->db->trans_start();
+            $query = $this->db->insert('answers',$valueArray);
+            $insert_id = $this->db->insert_id();            
+            $this->db->trans_complete();            
+                
+            if($query){
+                return $insert_id;  
+            } 
+                 
+    }
+
+    public function check_already_inspected($regno)
+    {
+        $this->db->select('id, vehicle_reg');
+        $this->db->from('answers');
+        $this->db->where('answers.is_deleted !=', 1);
+        $this->db->where('answers.response_type =', 'daily');
+        $this->db->where('answers.vehicle_reg', $regno);
+        $this->db->where("DATE_FORMAT(answers.response_on,'%Y-%m-%d') =", date('Y-m-d'));
+        $query = $this->db->get()->result();
+        return $query;
+    }
+
+    public function check_already_inspected_weekly($regno)
+    {
+        $today = date('Y-m-d');
+        $firstdaythisweek = date('Y-m-d', strtotime("next Monday") - 604800);
+        $this->db->select('id, vehicle_reg');
+        $this->db->from('answers');
+        $this->db->where('answers.is_deleted !=', 1);
+        $this->db->where('answers.response_type =', 'weekly');
+        $this->db->where('answers.vehicle_reg', $regno);
+        $this->db->where("DATE_FORMAT(answers.response_on,'%Y-%m-%d') >=", $firstdaythisweek);
+        $this->db->where("DATE_FORMAT(answers.response_on,'%Y-%m-%d') <=", $today);
+        $query = $this->db->get()->result();
+        return $query;
     }
   
 }

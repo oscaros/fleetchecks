@@ -2,6 +2,7 @@
 $regno = $answersforvehicle->vehicle_reg; 
 $date = $answersforvehicle->response_on; 
 $userid =$answersforvehicle->user_id;
+$comment= $answersforvehicle->comment;
 $answers = json_decode($answersforvehicle->response_ids);
 ?>
 <div class="content-wrapper">
@@ -46,56 +47,67 @@ $answers = json_decode($answersforvehicle->response_ids);
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-8">
-              <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title"><span style="text-transform: capitalize;"><?php echo $detailtype; ?></span> Inspection Report For <b><?php echo $regno; ?></b> done on  <b><?php echo date("d-m-Y", strtotime($date)); ?></b> at <b><?php echo date("H:i a", strtotime($date)); ?></b> by <b><span style="text-transform: capitalize;"><?php 
-                        foreach($usersinfo as $x){
-                            if($x->userid == $userid){
-                                echo $x->name;
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title"><span style="text-transform: capitalize;"><?php echo $detailtype; ?></span> Inspection Report For <b><?php echo $regno; ?></b> done on  <b><?php echo date("d-m-Y", strtotime($date)); ?></b> at <b><?php echo date("H:i a", strtotime($date)); ?></b> by <b><span style="text-transform: capitalize;"><?php 
+                            foreach($usersinfo as $x){
+                                if($x->userid == $userid){
+                                    echo $x->name;
+                                }
                             }
-                        }
-                    ?></b></span></h3>                 
-                </div><!-- /.box-header -->
-                <div class="box-body table-responsive no-padding">
-                  <table class="table table-hover">
-                    <tr>
-                        <th>Item</th>
-                        <th>Status</th>
-                    </tr> 
-                    <?php
-                    if(!empty($answers) && $checksinfo)
-                    {
-                        if (is_array($answers) || is_object($answers)){
-                          foreach($answers as $key=>$value){
-                        
-                    ?>                  
-                    <tr>
-                        <td><?php 
-                             foreach($checksinfo as $r1){
-                                 if((int)$r1->checkid == $key){
-                                      echo $r1->title;
-                                 }
-                             }
-                        ?></td>
-                        <td><span style="text-transform: capitalize;"><?php echo $value ?></span></td>
-                       
-                    </tr>
-                    <?php
-                            }
-                        }
-                    }
-                    ?>
-                  </table>
+                        ?></b></span></h3>                 
+                    </div><!-- /.box-header -->
+                    <div class="box-body table-responsive no-padding">
+                        <table class="table table-hover">
+                            <tr>
+                            <th>Item</th>
+                            <th>Status</th>
+                            </tr> 
+                                <?php
+                                if(!empty($answers) && $checksinfo)
+                                {
+                                    if (is_array($answers) || is_object($answers)){
+                                    foreach($answers as $key=>$value){
+                                    
+                                ?>                  
+                                <tr>
+                                    <td><?php 
+                                        foreach($checksinfo as $r1){
+                                            if((int)$r1->checkid == $key){
+                                                echo $r1->title;
+                                            }
+                                        }
+                                    ?></td>
+                                    <td><span style="text-transform: capitalize;"><?php echo $value ?></span></td>
+                                
+                                </tr>
+                                <?php
+                                        }
+                                    }
+                                }
+                                ?>
+                        </table>
                   
-                </div><!-- /.box-body -->
+                   </div><!-- /.box-body -->
+                    <div class="box">
+                        <div class="box-header">
+                             <h3 class="box-title">General Comment</h3>
+                             <!-- <div class="box-title"><?php //echo $comment; ?></div> -->
+                        </div>
+                        <div>
+                        <p class="text-left" style="margin-left:10px;"><?php echo $comment; ?></p>
+                        </div>
+
+                    </div>  
                 <div class="box-footer clearfix">
                     <?php //echo $this->pagination->create_links(); ?>
-                </div>
-              </div><!-- /.box -->
-            </div>
+             </div>
+          </div><!-- /.box -->
+                              
         </div>
-    </section>
+    </div>
+</section>
 </div>
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/common.js" charset="utf-8"></script>
 <script type="text/javascript">

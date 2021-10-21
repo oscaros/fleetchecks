@@ -167,7 +167,7 @@ class Login extends CI_Controller
                         setFlashData($status, "Reset password link sent successfully, please check mails.");
                     } else {
                         $status = "notsend";
-                        setFlashData($status, "Email has been failed, try again.");
+                        setFlashData($status, "Email sending has failed, try again.");
                     }
                 }
                 else

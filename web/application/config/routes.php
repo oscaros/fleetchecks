@@ -109,6 +109,13 @@ $route['editVehicleAssignment/(:num)/(:num)'] = 'vehicle/editVehicleAssignment/$
 $route['editVehicleAssignmentPost'] = 'vehicle/editVehicleAssignmentPost';
 $route['viewInspectionDetail/(:num)/(:any)'] = 'vehicle/viewInspectionDetail/$1/$2';
 $route['deleteVehicle'] = "vehicle/deleteVehicle";
+$route['deleteAnswer'] = "vehicle/deleteAnswer";
+$route['dailyInsp'] = "vehicle/dailyInsp";
+$route['weeklyInsp'] = "vehicle/weeklyInsp";
+$route['addNewDailyInsp'] = "vehicle/addNewDailyInsp";
+$route['addNewWeeklyInsp'] = "vehicle/addNewWeeklyInsp";
+$route['addNewWeeklyInspPost']['post'] = "vehicle/addNewWeeklyInspPost";
+$route['addNewDailyInspPost']['post'] = "vehicle/addNewDailyInspPost";
 
 
 /* End of file routes.php */

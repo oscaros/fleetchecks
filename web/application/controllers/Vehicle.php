@@ -361,34 +361,29 @@ class Vehicle extends BaseController
         }
 
       function viewInspectionDetail($answersId = NULL, $detailType = NULL){
-            if(!$this->isAdmin())
-                {
-                    $this->loadThis();
-                }
-                else
-                {
-                    if($answersId == null)
-                    {
-                        redirect('dashboard');
-                    }
-                    $this->load->model('vehicle_model');
-                    //$data['dailyrecords'] = $this->vehicle_model->getDailySubmissions();                    
-                    $data['usersinfo'] = $this->vehicle_model->getUsers();
-                    $data['detailtype'] = $detailType;
+           
+        if($answersId == null)
+        {
+            redirect('dashboard');
+        }
+        $this->load->model('vehicle_model');
+        //$data['dailyrecords'] = $this->vehicle_model->getDailySubmissions();                    
+        $data['usersinfo'] = $this->vehicle_model->getUsers();
+        $data['detailtype'] = $detailType;
 
-                    if($detailType == "daily"){
-                    $data['checksinfo'] = $this->vehicle_model->getDailyChecks();
-                    $data['answersforvehicle'] = $this->vehicle_model->getDailySubmissionsForOneVehicle($answersId);
-                    
-                    }elseif($detailType == "weekly"){
-                        $data['checksinfo'] = $this->vehicle_model->getWeeklyChecks();
-                        $data['answersforvehicle'] = $this->vehicle_model->getWeeklySubmissionsForOneVehicle($answersId);
-                    }
+        if($detailType == "daily"){
+        $data['checksinfo'] = $this->vehicle_model->getDailyChecks();
+        $data['answersforvehicle'] = $this->vehicle_model->getDailySubmissionsForOneVehicle($answersId);
+        
+        }elseif($detailType == "weekly"){
+            $data['checksinfo'] = $this->vehicle_model->getWeeklyChecks();
+            $data['answersforvehicle'] = $this->vehicle_model->getWeeklySubmissionsForOneVehicle($answersId);
+        }
 
-                    $this->global['pageTitle'] = 'FleetChecks : View Daily Inspection Detail';
-                    
-                    $this->loadViews("viewInspectionDetail", $this->global, $data, NULL);
-                }
+        $this->global['pageTitle'] = 'FleetChecks : View Daily Inspection Detail';
+        
+        $this->loadViews("viewInspectionDetail", $this->global, $data, NULL);
+                
       }
 
       function deleteVehicle()
@@ -408,6 +403,148 @@ class Vehicle extends BaseController
               else { echo(json_encode(array('status'=>FALSE))); }
           }
       }
+
+      function deleteAnswer(){
+       
+            $answerId = $this->input->post('answerId');
+            $answerInfo = array('is_deleted'=>1,'updatedBy'=>$this->vendorId, 'updatedDtm'=>date('Y-m-d H:i:s'));
+            
+            $result = $this->vehicle_model->deleteAnswer($answerId, $answerInfo);
+            
+            if ($result > 0) { echo(json_encode(array('status'=>TRUE))); }
+            else { echo(json_encode(array('status'=>FALSE))); }
+        
+      }
+
+      function dailyInsp()
+      {      
+              $searchText = $this->security->xss_clean($this->input->post('searchText'));
+              $data['searchText'] = $searchText;              
+              $this->load->library('pagination');              
+              $count = $this->vehicle_model->dailyInspCount($searchText, $this->vendorId);  
+              $returns = $this->paginationCompress ( "inspectiondaily/", $count, 10 );              
+              $data['dailyinspinfo'] = $this->vehicle_model->dailyInsp($searchText, $returns["page"], $returns["segment"], $this->vendorId);
+              //$data['vehicleAssignmentRecords'] = $this->vehicle_model->getVehicleAssignmentRecords();              
+              $this->global['pageTitle'] = 'FleetChecks : Daily Inspection';              
+              $this->loadViews("inspectiondaily", $this->global, $data, NULL);
+          
+      }
+
+      function weeklyInsp()
+      { 
+              $searchText = $this->security->xss_clean($this->input->post('searchText'));
+              $data['searchText'] = $searchText;
+              
+              $this->load->library('pagination');              
+              $count = $this->vehicle_model->weeklyInspCount($searchText, $this->vendorId);  
+              $returns = $this->paginationCompress ( "inspectionweekly/", $count, 10 );              
+              $data['weeklyinspinfo'] = $this->vehicle_model->weeklyInsp($searchText, $returns["page"], $returns["segment"], $this->vendorId);
+              //$data['vehicleAssignmentRecords'] = $this->vehicle_model->getVehicleAssignmentRecords();              
+              $this->global['pageTitle'] = 'FleetChecks : Weekly Inspection';              
+              $this->loadViews("inspectionweekly", $this->global, $data, NULL);
+          
+      }
+
+      function addNewDailyInsp()
+      {
+            $this->load->model('vehicle_model');
+            $data['depts'] = $this->vehicle_model->getDepartments();
+            $data['assignedvehicles'] = $this->vehicle_model->get_assigned_vehicles($this->vendorId); 
+            //$data['weeklychecks'] = $this->vehicle_model->weeklyCheckQuestions();
+            $data['dailychecks'] = $this->vehicle_model->dailyCheckQuestions();          
+            $this->global['pageTitle'] = 'FleetChecks : Add New Daily Inspection';  
+            $this->loadViews("addNewDailyInsp", $this->global, $data, NULL); 
+               
+      }
+
+      function addNewWeeklyInsp()
+      {
+              $this->load->model('vehicle_model');
+              $data['depts'] = $this->vehicle_model->getDepartments();
+              $data['assignedvehicles'] = $this->vehicle_model->get_assigned_vehicles($this->vendorId); 
+              $data['weeklychecks'] = $this->vehicle_model->weeklyCheckQuestions();
+              //$data['dailychecks'] = $this->vehicle_model->dailyCheckQuestions();          
+              $this->global['pageTitle'] = 'FleetChecks : Add New Daily Inspection';  
+              $this->loadViews("addNewWeeklyInsp", $this->global, $data, NULL);          
+      }
+
+      function addNewWeeklyInspPost(){
+        $method = $_SERVER['REQUEST_METHOD'];
+		if($method != 'POST'){
+			//json_output(400, array('status' => 400,'message' => 'Bad request.'));
+		} else {		
+            //echo gettype($_POST); 
+            $vehicle_reg = $_POST['vehicle'];
+            $comment =  $_POST['comment'];
+
+            $response_ids = $_POST;
+            unset($response_ids['vehicle']);
+            unset($response_ids['comment']);
+
+			//$params = json_encode($_POST);
+            //echo $params;
+            //echo gettype($params);
+            $check = $this->vehicle_model->check_already_inspected_weekly($vehicle_reg);
+            if($check == FALSE){
+                $result = $this->vehicle_model->addNewWeeklyInspPost($this->vendorId, $vehicle_reg, $comment, $response_ids);
+                if($result == true)
+                {
+                    echo "Weekly Vehicle inspection entry submission successful";
+                }
+                else
+                {
+                    echo "Weekly Vehicle inspection entry submission failed";
+                }
+            }else{
+                echo "vehicle has already been inspected this week";
+            }
+        }	
+      }
+
+      function addNewDailyInspPost(){
+        $this->load->library('form_validation');            
+        $this->form_validation->set_rules('vehicle','Select vehicle','trim|required|max_length[128]');
+        
+        if($this->form_validation->run() == FALSE)
+        {
+            $this->dailyInsp();
+        }
+        else
+        {
+            $method = $_SERVER['REQUEST_METHOD'];
+            if($method != 'POST'){
+                //json_output(400, array('status' => 400,'message' => 'Bad request.'));
+            } else {		
+                //echo gettype($_POST); 
+                $vehicle_reg = $_POST['vehicle'];
+                $comment =  $_POST['comment'];
+
+                $response_ids = $_POST;
+                unset($response_ids['vehicle']);
+                unset($response_ids['comment']);
+
+                //$params = json_encode($_POST);
+                //echo $params;
+                //echo gettype($params);
+                       //check if that regno has been submitted already
+                $check = $this->vehicle_model->check_already_inspected($vehicle_reg);
+                if($check == FALSE){
+                    $result = $this->vehicle_model->addNewDailyInspPost($this->vendorId, $vehicle_reg, $comment, $response_ids);
+                    if($result == true)
+                    {
+                        echo "Daily Vehicle inspection entry submission successful";
+                    }
+                    else
+                    {
+                        echo "Daily Vehicle inspection entry submission failed";
+                    }
+                }else{
+                    echo "vehicle has already been inspected today";
+                }
+            }
+        }
+      }
+
       
 
 

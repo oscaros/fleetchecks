@@ -138,7 +138,23 @@
                 <li><a href="#"><i class="fa fa-circle-o"></i> Level One</a></li>
               </ul>
             </li> -->
+            <?php if($role == ROLE_ADMIN || $role == ROLE_MANAGER || $role == ROLE_EMPLOYEE)
+            {
+              ?>
+            <li>
+              <a href="<?php echo base_url(); ?>dailyInsp" >
+                <i class="fa fa-check-square-o"></i>
+                <span>Daily Inspections</span>
+              </a>
+            </li>
+            <li>
+              <a href="<?php echo base_url(); ?>weeklyInsp" >
+                <i class="fa fa-check-square-o"></i>
+                <span>Weekly Inspections</span>
+              </a>
+            </li>
             <?php
+            }
             if($role == ROLE_ADMIN || $role == ROLE_MANAGER)
             {
             ?>

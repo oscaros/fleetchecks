@@ -46,10 +46,10 @@ class Login_model extends CI_Model
      */
     function checkEmailExist($email)
     {
-        $this->db->select('userId');
+        $this->db->select('id');
         $this->db->where('email', $email);
-        $this->db->where('isDeleted', 0);
-        $query = $this->db->get('tbl_users');
+        $this->db->where('is_deleted', 0);
+        $query = $this->db->get('users');
 
         if ($query->num_rows() > 0){
             return true;
@@ -82,9 +82,9 @@ class Login_model extends CI_Model
      */
     function getCustomerInfoByEmail($email)
     {
-        $this->db->select('userId, email, name');
-        $this->db->from('tbl_users');
-        $this->db->where('isDeleted', 0);
+        $this->db->select('id, email, name');
+        $this->db->from('users');
+        $this->db->where('is_deleted', 0);
         $this->db->where('email', $email);
         $query = $this->db->get();
 
@@ -110,8 +110,8 @@ class Login_model extends CI_Model
     function createPasswordUser($email, $password)
     {
         $this->db->where('email', $email);
-        $this->db->where('isDeleted', 0);
-        $this->db->update('tbl_users', array('password'=>getHashedPassword($password)));
+        $this->db->where('is_deleted', 0);
+        $this->db->update('users', array('password'=>getHashedPassword($password)));
         $this->db->delete('tbl_reset_password', array('email'=>$email));
     }
 
