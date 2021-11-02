@@ -51,9 +51,9 @@ $answers = json_decode($answersforvehicle->response_ids);
                 <div class="form-group">                   
                     <a class="btn btn-primary" href="<?php 
                     if ($detailtype == "daily"){
-                     echo base_url().'dailyInsp/'; 
+                     echo base_url().'dailyReports/'; 
                     }else{
-                        echo base_url().'weeklyInsp/'; 
+                        echo base_url().'weeklyReports/'; 
                     }?>"><i class="fa fa-arrow-left"></i> Back</a>
                 </div>
             </div>
