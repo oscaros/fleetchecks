@@ -64,10 +64,10 @@
                 <div class="box-body table-responsive no-padding">
                   <table class="table table-hover">
                     <tr>
-                        <th>Name</th>
                         <th>RegNo</th>
+                        <th>Name</th>                        
                         <th>Model</th>
-                        <th>Color</th>
+                        <th>Type</th>
                         <th>Department</th>
                         <th class="text-center">Actions</th>
                     </tr>
@@ -78,10 +78,10 @@
                         {
                     ?>
                     <tr>
-                        <td><?php echo $record->name ?></td>
                         <td><?php echo $record->regno ?></td>
+                        <td><?php echo $record->name ?></td>                        
                         <td><?php echo $record->model ?></td>
-                        <td><?php echo $record->color ?></td>
+                        <td><?php echo $record->type ?></td>
                         <td><?php echo $record->department ?></td>
                         <td class="text-center">
                             <?php

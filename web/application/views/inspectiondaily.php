@@ -80,7 +80,7 @@
                         <td><?php echo $record->response_on ?></td>
                         <td><?php echo $record->vehicle_reg ?></td>
                         <td class="text-center">
-                            <a class="btn btn-sm btn-primary" href="<?= base_url().'viewInspectionDetail/'.$record->check_id.'/'.'daily';  ?>" title="Assign to a user"><i class="fa fa-eye"></i></a> 
+                            <a class="btn btn-sm btn-primary" href="<?= base_url().'viewInspectionDetail/'.$record->check_id.'/'.'daily';  ?>" title="view inspection"><i class="fa fa-eye"></i></a> 
                             <a class="btn btn-sm btn-danger deleteAnswer" href="#" data-answerid="<?php echo $record->check_id; ?>" title="Delete"><i class="fa fa-trash"></i></a>
                         </td>
                     </tr>

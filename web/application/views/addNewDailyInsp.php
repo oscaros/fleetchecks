@@ -10,12 +10,17 @@
     <section class="content">
     
         <div class="row">
+             <div class="row">
+                <div class="col-xs-12 text-right">
+                    <div class="form-group">                   
+                        <a class="btn btn-primary" href="<?php echo base_url().'dailyInsp/'; ?>"><i class="fa fa-arrow-left"></i> Back</a>
+                    </div>
+                </div>
+            </div>
             <!-- left column -->
             <div class="col-md-12">
               <!-- general form elements -->
-                
-                
-                
+                              
                 <div class="box box-primary">
                     <div class="box-header">
                         <h3 class="box-title">Enter responses to the daily checks below </h3>
@@ -27,9 +32,9 @@
                             <div class="row">
                                 <div class="col-md-4">                                
                                     <div class="form-group">
-                                        <label for="regno">Select the Vehicle you would like to inspect</label>
+                                        <label for="vehicle">Select the Vehicle you would like to inspect *</label>
                                         <select class="form-control required" id="vehicle" name="vehicle">
-                                            <option>Select vehicle</option>
+                                            <option value="">Select vehicle</option>
                                             <?php
                                             if(!empty($assignedvehicles))
                                             {
@@ -49,7 +54,7 @@
                                  ?>
                                 <div class="col-md-4">                                
                                     <div class="form-group">
-                                        <label for="regno"><?php echo $r1->title; ?></label>
+                                        <label for="regno"><?php echo $r1->title; ?> *</label>
                                         <select class="form-control required" id="answer" name="<?php echo $r1->id; ?>">
                                             <option value="pass">Pass</option>
                                             <option value="fail">Fail</option>
@@ -69,7 +74,7 @@
                                 <div class="col-md-4">                                
                                     <div class="form-group">
                                         <label for="comment">Add a comment to explain the fails if any</label>
-                                        <textarea class="form-control required" name="comment"></textarea>
+                                        <textarea class="form-control required"  id="comment" name="comment"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -119,6 +124,7 @@
 <script src="<?php echo base_url(); ?>assets/js/addUser.js" type="text/javascript"></script>
 <script type="text/javascript">
 function jsfunction(){
+    
     //var formData = new FormData();
 
     var formElement = document.querySelector("form");
@@ -127,19 +133,47 @@ function jsfunction(){
     var http = new XMLHttpRequest();
     var url = '<?php echo base_url(); ?>addNewDailyInspPost';
     //var params = 'orem=ipsum&name=binny';
-    http.open('POST', url, true);
 
-    //Send the proper header information along with the request
-    //http.setRequestHeader('Content-Type', 'multipart/form-data');
-
-    http.onreadystatechange = function() {//Call a function when the state changes.
-        if(http.readyState == 4 && http.status == 200) {
-            alert(http.responseText);
-            window.location.href = "<?php echo base_url(); ?>dailyInsp";
-        }//else{
-           //alert(http.responseText); 
-       //}
+    //do some client side validation
+    var textarea = document.getElementById('comment').value;
+    var vehicle = document.getElementById('vehicle').value;
+    // for(var pair of formData.entries()){
+    //     alert(pair)
+    // }
+    var failFlag = false;
+    for(var pair of formData.values()){
+        if(pair == "fail"){
+            failFlag = true;
+        }
     }
-    http.send(formData);
+
+    //alert(failFlag);
+
+    if(vehicle == ""){
+        alert("Please select vehicle first");
+        //break;
+    }else{
+
+        if(failFlag == true && textarea == ""){
+            alert("Please add comment to elaborate the reason for the fail(s)");
+            
+        }else{
+                http.open('POST', url, true);
+                //Send the proper header information along with the request
+                //http.setRequestHeader('Content-Type', 'multipart/form-data');
+                http.onreadystatechange = function() {//Call a function when the state changes.
+                    if(http.readyState == 4 && http.status == 200) {
+                        alert(http.responseText);
+                        window.location.href = "<?php echo base_url(); ?>dailyInsp";
+                    }
+                }
+                http.send(formData);
+            } 
+    }
+
+        
+
+
+   
 }
 </script>

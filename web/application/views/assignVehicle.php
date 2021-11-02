@@ -3,6 +3,7 @@ $vehicleid = $vehicleinfo->vehicleId;
 $vehicleName = $vehicleinfo->name;
 $regno = $vehicleinfo->regno;
 $color = $vehicleinfo->color;
+$model = $vehicleinfo->model;
 //$isAdmin = $userInfo->isAdmin;
 ?>
 
@@ -16,6 +17,13 @@ $color = $vehicleinfo->color;
     </section>
     
     <section class="content">
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <div class="form-group">                    
+                    <a class="btn btn-primary" href="<?= base_url().'viewAssignedCustodians/'.$vehicleid; ?>"><i class="fa fa-arrow-left"></i> Back</a>
+                </div>
+            </div>
+        </div>
     
         <div class="row">
             <!-- left column -->
@@ -50,8 +58,8 @@ $color = $vehicleinfo->color;
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="color">Vehicle Color</label>
-                                        <input type="color" class="form-control" id="color" placeholder="color" name="color" readonly>
+                                        <label for="model">Vehicle Model</label>
+                                        <input type="text" value="<?php echo $model; ?>" class="form-control" id="color" placeholder="color" name="color" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6">

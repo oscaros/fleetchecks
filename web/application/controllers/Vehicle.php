@@ -64,6 +64,8 @@ class Vehicle extends BaseController
         {
             $this->load->model('vehicle_model');
             $data['depts'] = $this->vehicle_model->getDepartments();
+            $data['sects'] = $this->vehicle_model->getSections();
+            $data['users'] = $this->vehicle_model->getUsers();
             
             $this->global['pageTitle'] = 'FleetChecks : Add New Vehicle';
 
@@ -140,16 +142,58 @@ class Vehicle extends BaseController
             $this->loadThis();
         }
         else
-        {    
+        {
+            $this->load->library('form_validation');
+            
+            $this->form_validation->set_rules('regno','Registration Number','trim|required|max_length[128]');
+            $this->form_validation->set_rules('name','Vehicle Make','required|max_length[128]');
+            $this->form_validation->set_rules('dept','Department','required|max_length[128]');
+            $this->form_validation->set_rules('type','Vehicle type','required|max_length[128]');
+            $this->form_validation->set_rules('model','Model','trim|required|max_length[128]');
+            $this->form_validation->set_rules('ownership','ownership','required|min_length[120]');
+            $this->form_validation->set_rules('status','status','required|min_length[128]');
+            
+            if($this->form_validation->run() == FALSE)
+            {
+                $this->addNewVehicle();
+            }
+            else
+            { 
+            
+
             $name = $this->security->xss_clean($this->input->post('name'));
             $regno = $this->security->xss_clean($this->input->post('regno'));
             $model = $this->input->post('model');
             $dept = $this->input->post('dept');
             $color = $this->input->post('color');
+            $type = $this->input->post('type');
+            $sect = $this->input->post('sect');
+            $region = $this->input->post('region');
+            $yop = $this->input->post('yop');
+            $ownership = $this->input->post('ownership');
+            $resp = $this->input->post('resp');
+            $supervisor = $this->input->post('supervisor');
+            $supplier = $this->input->post('supplier');
+            $capacity = $this->input->post('capacity');
+            $allocation = $this->input->post('allocation');
+            $cardno = $this->input->post('card');
+            $status = $this->input->post('status');
+            $power = $this->input->post('power');
             
-            $vehicleInfo = array('name'=>$name, 'regno'=>$regno,
-                'model'=> $model, 'department'=>$dept, 'created_by'=>$this->vendorId, 'color'=>$color,
-                'createdDtm'=>date('Y-m-d H:i:s'));
+            $vehicleInfo = array('name'=>$name, 
+            'regno'=>$regno,
+            'model'=> $model, 
+            'department'=>$dept, 
+            'created_by'=>$this->vendorId, 
+            'color'=>$color,
+            'createdDtm'=>date('Y-m-d H:i:s'),
+            'type'=>$type,'section'=>$sect,
+            'power'=>$power,'region'=>$region,
+            'year_of_purchase'=>$yop,'ownership'=>$ownership,
+            'responsible'=>$resp,'supervisor'=>$supervisor,
+            'fuel_supplier'=>$supplier,'tank_capacity'=>$capacity,
+            'monthly_allocation'=>$allocation,'card_no'=>$cardno,'status'=>$status
+        );
             //var_dump($vehicleInfo);
             $this->load->model('vehicle_model');
             $result = $this->vehicle_model->addNewVehiclePost($vehicleInfo);
@@ -161,7 +205,9 @@ class Vehicle extends BaseController
             }
             
             redirect('addNewVehicle');
-        }        
+        }  
+        
+        }
     }
 
     function editVehicle($vehicleId = NULL)
@@ -181,6 +227,8 @@ class Vehicle extends BaseController
             $data['vehicleInfo'] = $this->vehicle_model->getVehicleInfo($vehicleId);
             $data['depts'] = $this->vehicle_model->getDepartments();
             $data['colors'] = $this->vehicle_model->getColors();
+            $data['sects'] = $this->vehicle_model->getSections();
+            $data['users'] = $this->vehicle_model->getUsers();
 
             $this->global['pageTitle'] = 'FleetChecks : Edit User';
             
@@ -194,18 +242,62 @@ class Vehicle extends BaseController
                 $this->loadThis();
             }
             else
-            {            
+            {  
+                
+                $this->load->library('form_validation');
+            
+                $this->form_validation->set_rules('regno','Registration Number','trim|required|max_length[128]');
+                $this->form_validation->set_rules('name','Vehicle Make','required|max_length[128]');
+                $this->form_validation->set_rules('dept','Department','required|max_length[128]');
+                $this->form_validation->set_rules('type','Vehicle type','required|max_length[128]');
+                $this->form_validation->set_rules('model','Model','trim|required|max_length[128]');
+                $this->form_validation->set_rules('ownership','ownership','required|min_length[120]');
+                $this->form_validation->set_rules('status','status','required|min_length[128]');
+                
+                if($this->form_validation->run() == FALSE)
+                {
+                    $this->editVehicle();
+                }
+                else
+                { 
+
                 $vehicleId = $this->input->post('vehicleId');
                 $name = $this->security->xss_clean($this->input->post('name'));
                 $model = $this->security->xss_clean($this->input->post('model'));
                 $regno = $this->input->post('regno');
                 $color = $this->input->post('color');
-                $dept = $this->security->xss_clean($this->input->post('dept'));               
+                $dept = $this->security->xss_clean($this->input->post('dept'));  
+                $type = $this->input->post('type');
+
+                $sect = $this->input->post('sect');
+                $region = $this->input->post('region');
+                $yop = $this->input->post('yop');
+                $ownership = $this->input->post('ownership');
+                $resp = $this->input->post('resp');
+                $supervisor = $this->input->post('supervisor');
+                $supplier = $this->input->post('supplier');
+                $capacity = $this->input->post('capacity');
+                $allocation = $this->input->post('allocation');
+                $cardno = $this->input->post('card');
+                $status = $this->input->post('status');
+                $power = $this->input->post('power');             
                 
                 $vehicleInfo = array();                
                
-                $vehicleInfo = array('name'=>$name, 'model'=>$model, 'regno'=>$regno, 'color'=>$color, 'department'=>$dept,
-                        'updatedBy'=>$this->vendorId, 'updatedDtm'=>date('Y-m-d H:i:s'));
+                $vehicleInfo = array('name'=>$name, 
+                        'regno'=>$regno,
+                        'model'=> $model, 
+                        'department'=>$dept, 
+                        'updatedBy'=>$this->vendorId, 
+                        'color'=>$color,
+                        'updatedDtm'=>date('Y-m-d H:i:s'),
+                        'type'=>$type,'section'=>$sect,
+                        'power'=>$power,'region'=>$region,
+                        'year_of_purchase'=>$yop,'ownership'=>$ownership,
+                        'responsible'=>$resp,'supervisor'=>$supervisor,
+                        'fuel_supplier'=>$supplier,'tank_capacity'=>$capacity,
+                        'monthly_allocation'=>$allocation,'card_no'=>$cardno,'status'=>$status
+                    );
                
                 $result = $this->vehicle_model->editVehicle($vehicleInfo, $vehicleId);
                 
@@ -219,6 +311,7 @@ class Vehicle extends BaseController
                 }
                 
                 redirect('vehicleListing');                
+             }
             }
         }
 
@@ -239,8 +332,8 @@ class Vehicle extends BaseController
                 $data['assignmentinfo'] = $this->vehicle_model->getAssignmentInfoPerVehicle($vehicleId);
                 $data['usersinfo'] = $this->vehicle_model->getUsers();
                 $data['vehiclereg'] = $this->vehicle_model->getregNo($vehicleId);
+                $data['vehicleId'] = $vehicleId;
 
-    
                 $this->global['pageTitle'] = 'FleetChecks : View Vehicle Assignment';
                 
                 $this->loadViews("viewAssignedCustodians", $this->global, $data, NULL);
@@ -507,7 +600,7 @@ class Vehicle extends BaseController
         
         if($this->form_validation->run() == FALSE)
         {
-            $this->dailyInsp();
+            $this->addNewDailyInsp();
         }
         else
         {

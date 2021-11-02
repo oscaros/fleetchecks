@@ -10,12 +10,16 @@
     <section class="content">
     
         <div class="row">
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    <div class="form-group">                   
+                        <a class="btn btn-primary" href="<?php echo base_url().'weeklyInsp/'; ?>"><i class="fa fa-arrow-left"></i> Back</a>
+                    </div>
+                </div>
+            </div>
             <!-- left column -->
             <div class="col-md-12">
-              <!-- general form elements -->
-                
-                
-                
+              <!-- general form elements -->   
                 <div class="box box-primary">
                     <div class="box-header">
                         <h3 class="box-title">Enter responses to the weekly checks below </h3>
@@ -27,9 +31,9 @@
                             <div class="row">
                                 <div class="col-md-4">                                
                                     <div class="form-group">
-                                        <label for="regno">Select the Vehicle you would like to inspect</label>
+                                        <label for="vehicle">Select the Vehicle you would like to inspect</label>
                                         <select class="form-control required" id="vehicle" name="vehicle">
-                                            <option value="unassigned">Select vehicle</option>
+                                            <option value="">Select vehicle</option>
                                             <?php
                                             if(!empty($assignedvehicles))
                                             {
@@ -50,16 +54,17 @@
                                 <div class="col-md-4">                                
                                     <div class="form-group">
                                         <label for="regno"><?php echo $r1->title; ?></label>
+                                        <?php
+                                            if($r1->title == "Enter Mileage"){ ?>
+                                            <input type="number" class="form-control required" id="mileage" name="<?php echo $r1->id;?>">
+                                            <?php }else{ ?>
+                                           
                                         <select class="form-control required" id="answer" name="<?php echo $r1->id; ?>">
                                             <option value="pass">Pass</option>
                                             <option value="fail">Fail</option>
                                             <option value="NA">Not Applicable</option>
                                         </select>
-                                        <!-- <div class="form-group">
-                                            <input type="radio" id="contactChoice1" name="contact" value="email" required><span>Pass</span>
-                                            <input type="radio" id="contactChoice1" name="contact" value="email"><span>Fail</span>
-                                            <input type="radio" id="contactChoice1" name="contact" value="email"><span>Not Applicable</span>
-                                        </div> -->
+                                        <?php } ?>
                                 </div>
 
                                 
@@ -69,7 +74,7 @@
                                 <div class="col-md-4">                                
                                     <div class="form-group">
                                         <label for="comment">Add a comment to explain the fails if any</label>
-                                        <textarea class="form-control required" name="comment"></textarea>
+                                        <textarea class="form-control required" id="comment" name="comment"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -156,20 +161,43 @@ function jsfunction(){
 
     var http = new XMLHttpRequest();
     var url = '<?php echo base_url(); ?>addNewWeeklyInspPost';
-    //var params = 'orem=ipsum&name=binny';
-    http.open('POST', url, true);
-
-    //Send the proper header information along with the request
-    //http.setRequestHeader('Content-Type', 'multipart/form-data');
-
-    http.onreadystatechange = function() {//Call a function when the state changes.
-        if(http.readyState == 4 && http.status == 200) {
-            alert(http.responseText);
-            window.location.href = "<?php echo base_url(); ?>weeklyInsp";
-        }//else{
-           //alert(http.responseText); 
-       //}
+     //do some client side validation
+    var textarea = document.getElementById('comment').value;
+    var vehicle = document.getElementById('vehicle').value;
+    var mileage = document.getElementById('mileage').value;
+    // for(var pair of formData.entries()){
+    //     alert(pair)
+    // }
+    var failFlag = false;
+    for(var pair of formData.values()){
+        if(pair == "fail"){
+            failFlag = true;
+        }
     }
-    http.send(formData);
+
+    //alert(failFlag);
+
+    if(vehicle == ""){
+        alert("Please select vehicle first");
+    }else if(mileage == ""){
+        alert("Please enter vehicle mileage");
+    }else{
+
+        if(failFlag == true && textarea == ""){
+            alert("Please add comment to elaborate the reason for the fail(s)");
+            
+        }else{
+                http.open('POST', url, true);
+                //Send the proper header information along with the request
+                //http.setRequestHeader('Content-Type', 'multipart/form-data');
+                http.onreadystatechange = function() {//Call a function when the state changes.
+                    if(http.readyState == 4 && http.status == 200) {
+                        alert(http.responseText);
+                        window.location.href = "<?php echo base_url(); ?>weeklyInsp";
+                    }
+                }
+                http.send(formData);
+            } 
+    }
 }
 </script>

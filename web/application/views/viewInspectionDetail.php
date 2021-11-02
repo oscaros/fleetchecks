@@ -9,8 +9,8 @@ $answers = json_decode($answersforvehicle->response_ids);
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        <i class="fa fa-car"></i> Daily Reports
-        <small>Inspection Report</small>
+        <i class="fa fa-car"></i> Inspection Detail
+        <small>Single Inspection Detail</small>
       </h1>
     </section>
     <section class="content">
@@ -43,6 +43,18 @@ $answers = json_decode($answersforvehicle->response_ids);
                     <div class="col-md-12">
                         <?php echo validation_errors('<div class="alert alert-danger alert-dismissable">', ' <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div>'); ?>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <div class="form-group">                   
+                    <a class="btn btn-primary" href="<?php 
+                    if ($detailtype == "daily"){
+                     echo base_url().'dailyInsp/'; 
+                    }else{
+                        echo base_url().'weeklyInsp/'; 
+                    }?>"><i class="fa fa-arrow-left"></i> Back</a>
                 </div>
             </div>
         </div>

@@ -23,7 +23,7 @@ class Vehicle_model extends CI_Model
             $this->db->where($likeCriteria);
         }
         $this->db->where('BaseTbl.is_deleted', 0);
-        // $this->db->where('BaseTbl.roleId !=', 1);
+        $this->db->where('BaseTbl.regno !=', '');
         $query = $this->db->get();
         
         return $query->num_rows();
@@ -38,7 +38,7 @@ class Vehicle_model extends CI_Model
      */
     function vehicleListing($searchText = '', $page, $segment)
     {
-        $this->db->select('BaseTbl.id as vehicle_id, BaseTbl.name, BaseTbl.regno, BaseTbl.department, BaseTbl.color, BaseTbl.model, BaseTbl.is_assigned');
+        $this->db->select('BaseTbl.id as vehicle_id, BaseTbl.name, BaseTbl.regno, BaseTbl.type, BaseTbl.department, BaseTbl.color, BaseTbl.model, BaseTbl.is_assigned');
         $this->db->from('vehicles as BaseTbl');
         if(!empty($searchText)) {
             $likeCriteria = "(BaseTbl.name  LIKE '%".$searchText."%'
@@ -50,7 +50,7 @@ class Vehicle_model extends CI_Model
             $this->db->where($likeCriteria);
         }
         $this->db->where('BaseTbl.is_deleted', 0);
-        // $this->db->where('BaseTbl.roleId !=', 1);
+        $this->db->where('BaseTbl.regno !=', '');
         $this->db->order_by('BaseTbl.id', 'DESC');
         $this->db->limit($page, $segment);
         $query = $this->db->get();
@@ -62,6 +62,15 @@ class Vehicle_model extends CI_Model
     function getDepartments(){
         $this->db->select('id as deptId, name');
         $this->db->from('departments');
+        $this->db->where('is_deleted =', 0);
+        $query = $this->db->get();
+        
+        return $query->result();
+    }
+
+    function getSections(){
+        $this->db->select('id as sectId, name');
+        $this->db->from('sections');
         $this->db->where('is_deleted =', 0);
         $query = $this->db->get();
         
@@ -87,7 +96,8 @@ class Vehicle_model extends CI_Model
 
     function getVehicleInfo($vehicleId)
     {
-        $this->db->select('id as vehicleId, name, model, regno, color, department');
+        $this->db->select('id as vehicleId, name, model, regno, color, department, section, type, power, region, year_of_purchase, ownership,
+        responsible, supervisor, fuel_supplier, monthly_allocation, tank_capacity, card_no, status');
         $this->db->from('vehicles');
         $this->db->where('is_deleted', 0);
         $this->db->where('id', $vehicleId);
@@ -147,6 +157,7 @@ class Vehicle_model extends CI_Model
     function getregNo($vehicleId){
         $this->db->select('id, regno');
         $this->db->from('vehicles');
+        $this->db->where('id', $vehicleId);
         $this->db->where('is_deleted', 0);
         $query = $this->db->get();
         

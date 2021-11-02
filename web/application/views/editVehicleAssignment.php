@@ -24,7 +24,13 @@ $assignId =$assignmentInfo->assignId;
             <!-- left column -->
             <div class="col-md-8">
               <!-- general form elements -->
-                
+                <div class="row">
+                    <div class="col-xs-12 text-right">
+                        <div class="form-group">                   
+                            <a class="btn btn-primary" href="<?php echo base_url().'viewAssignedCustodians/'.$vehicleId; ?>"><i class="fa fa-arrow-left"></i> Back</a>
+                        </div>
+                    </div>
+                </div>
                 
                 
                 <div class="box box-primary">
